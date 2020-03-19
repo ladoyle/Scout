@@ -68,7 +68,17 @@ class Watcher:
         self.observer.join()
 
 
+# method to sharpen frames as they're created
+def sharpen_frames(img_path):
+    frame = cv2.imread(img_path)
+    blur = cv2.GaussianBlur(frame, (5, 5), 0)
+    sharp = cv2.addWeighted(blur, -0.6, frame, 1.5, 0)
+    bright = cv2.pow(sharp / 255.0, 0.8)
+    cv2.imwrite(img_path, bright * 255)
+
+
 class Handler(FileSystemEventHandler):
+
 
     @staticmethod
     def on_any_event(event):
@@ -80,6 +90,9 @@ class Handler(FileSystemEventHandler):
             print("Received created event - %s." % event.src_path)
             try:
                 img_path = event.src_path
+
+                # added image sharpening and brightening
+                sharpen_frames(img_path)
 
                 print('\tScanning %s' % img_path)
 
